@@ -15,6 +15,18 @@ class PortalApi {
 
   static Future<Map<String, dynamic>> info(String path) => _get('/api$path');
 
+  static Future<void> reportDead(String playUrl) async {
+    try {
+      await http.post(
+        Uri.parse('$base/api/report-dead'),
+        headers: {'Content-Type': 'application/json', 'Accept': 'application/json'},
+        body: jsonEncode({'url': playUrl}),
+      );
+    } catch (_) {
+      // best-effort; filtering still works on next probe
+    }
+  }
+
   static Future<Map<String, dynamic>> _get(String path) async {
     final response = await http.get(Uri.parse('$base$path'));
     if (response.statusCode != 200) {

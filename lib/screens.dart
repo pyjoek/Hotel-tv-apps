@@ -103,7 +103,10 @@ class _PlayerScreenState extends State<PlayerScreen> {
         if (mounted) setState(() {});
         _controller.play();
       }).catchError((e) {
-        if (mounted) setState(() => _error = '$e');
+        if (mounted) {
+          setState(() => _error = '$e');
+          PortalApi.reportDead(widget.url);
+        }
       });
   }
 
@@ -119,7 +122,14 @@ class _PlayerScreenState extends State<PlayerScreen> {
       appBar: AppBar(title: Text(widget.title)),
       body: Center(
         child: _error != null
-            ? Text('Channel unavailable: $_error')
+            ? Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text('Channel unavailable: $_error'),
+                  const SizedBox(height: 16),
+                  const Text('It has been marked offline and will be filtered from the list.'),
+                ],
+              )
             : _controller.value.isInitialized
                 ? AspectRatio(aspectRatio: _controller.value.aspectRatio, child: VideoPlayer(_controller))
                 : const CircularProgressIndicator(),
